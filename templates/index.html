@@ -1,1 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREXPlay Spin Wheel Giveaway</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffd6d6, #ffe7d9);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #2d3436;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin: 20px 0 30px;
+            width: 100%;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            color: #ff4757;
+            text-shadow: 4px 4px 0px rgba(255, 71, 87, 0.2);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 span {
+            font-size: 4rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #2d3436;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* Wheel container */
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .wheel-wrap {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 100%;
+            margin: 0 auto;
+            border-radius: 50%;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            background: white;
+        }
+
+        .wheel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            height: calc(100% - 40px);
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(.17,.67,.83,.67);
+            transform: rotate(0deg);
+            background: conic-gradient(
+                #ffd24d 0deg 45deg,
+                #ff6f6f 45deg 90deg,
+                #ffd24d 90deg 135deg,
+                #ff6f6f 135deg 180deg,
+                #ffd24d 180deg 225deg,
+                #ff6f6f 225deg 270deg,
+                #ffd24d 270deg 315deg,
+                #ff6f6f 315deg 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.2),
+                inset 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        /* Wheel segments with perfect alignment */
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .wheel-section-text {
+            position: absolute;
+            width: 100px;
+            height: 40px;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) rotate(22.5deg);
+            text-align: center;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Central button and arrow */
+        .spin-center {
+            position: absolute;
+            z-index: 10;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .spin-arrow {
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 35px solid #ff4757;
+            margin-bottom: 12px;
+            pointer-events: none;
+            z-index: 15;
+            position: relative;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.3));
+        }
+
+        .spin-button {
+            pointer-events: auto;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffa502);
+            color: #2d3436;
+            font-weight: 800;
+            font-size: 1.8rem;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.35), 
+                inset 0 -8px 15px rgba(0,0,0,0.2),
+                inset 0 8px 15px rgba(255,255,255,0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .spin-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 12px 35px rgba(0,0,0,0.4), 
+                inset 0 -8px 15px rgba(0,0,0,0.2),
+                inset 0 8px 15px rgba(255,255,255,0.4);
+        }
+
+        .spin-button:disabled {
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hub {
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff 0 20%, #f3f3f3 21% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #333;
+            z-index: 5;
+            box-shadow: 
+                inset 0 5px 15px rgba(0,0,0,0.15), 
+                0 5px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Results section */
+        .result-container {
+            text-align: center;
+            min-height: 120px;
+            width: 100%;
+            max-width: 700px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+            margin: 20px 0;
+            transition: all 0.5s ease;
+            border: 5px solid #ffd24d;
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            color: #ff4757;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+        }
+
+        .result-content {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #2d3436;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .result-prize {
+            color: #e74c3c;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        }
+
+        /* Prizes section */
+        .prizes-section {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 5px solid #ff6f6f;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            color: #ff4757;
+            text-align: center;
+            margin-bottom: 35px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+        }
+
+        .prizes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-size: 1.8rem;
+        }
+
+        .prizes-table th {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #ff6f6f;
+            font-size: 2.2rem;
+        }
+
+        .prizes-table td {
+            padding: 18px;
+            text-align: center;
+            border-bottom: 2px solid #ffd6d6;
+            font-weight: 600;
+        }
+
+        .prizes-table tr:nth-child(even) {
+            background-color: rgba(255, 214, 214, 0.2);
+        }
+
+        .prizes-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .prize-name {
+            font-weight: 700;
+            color: #2d3436;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #2d3436;
+            font-size: 1.3rem;
+            width: 100%;
+            margin-top: auto;
+            font-weight: 600;
+        }
+
+        /* Confetti effect */
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            background-color: #ffd24d;
+            opacity: 0.8;
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .header h1 span {
+                font-size: 3.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .wheel-section-text {
+                font-size: 0.9rem;
+                width: 80px;
+                height: 30px;
+                top: 25px;
+            }
+            
+            .result-title {
+                font-size: 2.2rem;
+            }
+            
+            .result-content {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .prizes-table {
+                font-size: 1.4rem;
+            }
+            
+            .prizes-table th {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header h1 span {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .wheel-container {
+                max-width: 320px;
+            }
+            
+            .wheel-section-text {
+                font-size: 0.75rem;
+                width: 70px;
+                height: 25px;
+                top: 20px;
+            }
+            
+            .spin-button {
+                width: 90px;
+                height: 90px;
+                font-size: 1.4rem;
+            }
+            
+            .spin-arrow {
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-bottom: 28px solid #ff4757;
+            }
+            
+            .result-title {
+                font-size: 1.8rem;
+            }
+            
+            .result-content {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .prizes-table {
+                font-size: 1.2rem;
+            }
+            
+            .prizes-table th {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CREXPlay Giveaway <span>🎉👍🏻</span></h1>
+        <p class="subtitle">Spin the wheel for a chance to win amazing prizes! One spin per player.</p>
+    </div>
+    
+    <div class="container">
+        <div class="wheel-container">
+            <div class="wheel-wrap">
+                <div id="wheel" class="wheel">
+                    <div class="hub"></div>
+                    <!-- Wheel sections will be generated by JavaScript -->
+                </div>
+                
+                <div class="spin-center">
+                    <div class="spin-arrow"></div>
+                    <button class="spin-button" id="spin-button">SPIN</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-container" id="result-container">
+            <div class="result-title">Your Prize</div>
+            <div class="result-content" id="result-content">Spin the wheel to see what you win!</div>
+        </div>
+        
+        <div class="prizes-section">
+            <h2 class="section-title">Available Prizes</h2>
+            <table class="prizes-table">
+                <thead>
+                    <tr>
+                        <th>Prizes</th>
+                    </tr>
+                </thead>
+                <tbody id="prizes-table-body">
+                    <!-- Prizes will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        © 2023 CREXPlay Giveaway. All rights reserved.
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wheel = document.getElementById('wheel');
+            const spinButton = document.getElementById('spin-button');
+            const resultContent = document.getElementById('result-content');
+            const prizesTableBody = document.getElementById('prizes-table-body');
+            const resultContainer = document.getElementById('result-container');
+            
+            // Prize configuration with chances (not displayed to users)
+            const prizes = [
+                { name: "💰 10000₹", chance: 0 },
+                { name: "💰 1000₹", chance: 0 },
+                { name: "💰 500₹", chance: 0 },
+                { name: "💰 200₹", chance: 0 },
+                { name: "💰 100₹", chance: 5 },
+                { name: "💰 50₹", chance: 10 },
+                { name: "💰 10₹", chance: 30 },
+                { name: "🙁 Better Luck Next Time", chance: 60 }
+            ];
+            
+            // Create wheel sections with perfect alignment
+            const anglePerSection = 360 / prizes.length;
+            
+            prizes.forEach((prize, index) => {
+                // Create wheel segment
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.transform = `rotate(${index * anglePerSection}deg)`;
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'wheel-section-text';
+                textDiv.textContent = prize.name;
+                section.appendChild(textDiv);
+                
+                wheel.appendChild(section);
+                
+                // Create table row for prize (only show prize name)
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.className = 'prize-name';
+                cell.textContent = prize.name;
+                row.appendChild(cell);
+                prizesTableBody.appendChild(row);
+            });
+            
+            // Simulate session management
+            let hasSpun = localStorage.getItem('hasSpun') === 'true';
+            let userPrize = localStorage.getItem('userPrize');
+            
+            if (hasSpun) {
+                resultContent.innerHTML = `<span class="result-prize">${userPrize}</span>`;
+                resultContainer.style.background = 'rgba(255, 235, 235, 0.95)';
+                spinButton.disabled = true;
+                spinButton.textContent = "Giveaway Over";
+            }
+            
+            spinButton.addEventListener('click', spinWheel);
+            
+            function spinWheel() {
+                if (hasSpun) {
+                    resultContent.innerHTML = `<span class="result-prize">${userPrize}</span>`;
+                    resultContainer.style.background = 'rgba(255, 235, 235, 0.95)';
+                    spinButton.disabled = true;
+                    spinButton.textContent = "Giveaway Over";
+                    return;
+                }
+                
+                spinButton.disabled = true;
+                resultContent.textContent = "Spinning...";
+                resultContainer.style.background = 'rgba(255, 255, 235, 0.95)';
+                
+                // Select prize based on weighted chances
+                const weights = prizes.map(p => p.chance);
+                const totalWeight = weights.reduce((a, b) => a + b, 0);
+                let random = Math.random() * totalWeight;
+                let selectedPrize = null;
+                
+                for (let i = 0; i < prizes.length; i++) {
+                    random -= weights[i];
+                    if (random <= 0) {
+                        selectedPrize = prizes[i];
+                        break;
+                    }
+                }
+                
+                const prizeText = selectedPrize.name;
+                
+                // Store the prize
+                userPrize = prizeText;
+                hasSpun = true;
+                
+                // Save to localStorage
+                localStorage.setItem('hasSpun', 'true');
+                localStorage.setItem('userPrize', userPrize);
+                
+                // Calculate rotation - ensure the selected prize lands at the top
+                const prizeIndex = prizes.findIndex(p => p === selectedPrize);
+                const segmentCenter = prizeIndex * anglePerSection + anglePerSection / 2;
+                const bigRotations = Math.floor(Math.random() * 3) + 4; // 4 to 6 full spins
+                const finalDeg = bigRotations * 360 + (360 - segmentCenter) + Math.random() * (anglePerSection - 8) - (anglePerSection/2 -4);
+                
+                // Apply the rotation
+                wheel.style.transition = 'transform 4.5s cubic-bezier(.15,.8,.2,1)';
+                wheel.style.transform = `rotate(${finalDeg}deg)`;
+                
+                // After spinning animation completes
+                setTimeout(() => {
+                    resultContent.innerHTML = `<span class="result-prize">${prizeText}</span>`;
+                    
+                    if (selectedPrize.name === "🙁 Better Luck Next Time") {
+                        resultContainer.style.background = 'rgba(255, 235, 235, 0.95)';
+                    } else {
+                        resultContainer.style.background = 'rgba(235, 255, 235, 0.95)';
+                        createConfetti();
+                    }
+                    
+                    spinButton.textContent = "Giveaway Over";
+                }, 4500);
+            }
+            
+            // Confetti effect for winning
+            function createConfetti() {
+                const colors = ['#ffd24d', '#ff6f6f', '#ff4757', '#4ecdc4', '#6a0572'];
+                for (let i = 0; i < 200; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.top = `${Math.random() * -20}vh`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = `${Math.random() * 12 + 6}px`;
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.opacity = Math.random() * 0.6 + 0.4;
+                    document.body.appendChild(confetti);
+                    
+                    // Animate confetti
+                    const animation = confetti.animate([
+                        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                        { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 4000 + 3000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                    });
+                    
+                    // Remove after animation
+                    animation.onfinish = () => confetti.remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
